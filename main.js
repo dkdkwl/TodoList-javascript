@@ -11,61 +11,70 @@
 
 let taskInput = document.querySelector(".task-input");
 let addButton = document.querySelector(".button-add");
+let tabs = document.querySelectorAll(".tab-type div");
+let mode = '';
+let filterList = [];
 let taskList = [];
 
 
-console.log(addButton)
+for(let i=1;i<tabs.length;i++){
+    tabs[i].addEventListener("click",function(event){
+        filter(event);
+    });
+}
+
 addButton.addEventListener("click",addTask);
 
 function addTask(){
     let task = {
-        id : tandomIDGenerate(),
+        id : randomIDGenerate(),
         taskContent : taskInput.value,
         isComplete : false
     }
     taskList.push(task);
-    console.log(taskList);
     render();
-
 }
 
 function render(){
+    let list = [];
+    if(mode == "all"){
+        list = taskList;
+    }else if(mode == "ongoing"){
+        console.log("111")
+        list = filterList;
+    }
     let resultHTML = '';
-    for(let i=0; i<taskList.length; i++){
-        if(taskList[i].isComplete == true){
+    for(let i=0; i<list.length; i++){
+        if(list[i].isComplete == true){
             resultHTML += `
             <div id="task-board"><div class="task" id="">
-                <div class="task-done">${taskList[i].taskContent}</div>
+                <div class="task-done">${list[i].taskContent}</div>
                 <div class="button-box">
-                <button><i class="fa fa-check" onClick="toggleComplete('${taskList[i].id}')" aria-hidden="true"></i></button>
-                <button><i class="fa fa-trash" onClick="deleteTask('${taskList[i].id}');" aria-hidden="true"></i></button>
+                <button><i class="fa fa-check" onClick="toggleComplete('${list[i].id}')" aria-hidden="true"></i></button>
+                <button><i class="fa fa-trash" onClick="deleteTask('${list[i].id}');" aria-hidden="true"></i></button>
                 </div>
             </div></div> `
         }else{
             resultHTML += `
             <div id="task-board"><div class="task" id="">
-                <div class="">${taskList[i].taskContent}</div>
+                <div class="">${list[i].taskContent}</div>
                 <div class="button-box">
-                <button><i class="fa fa-check" onClick="toggleComplete('${taskList[i].id}')" aria-hidden="true"></i></button>
-                <button><i class="fa fa-trash" onClick="deleteTask('${taskList[i].id}');"aria-hidden="true"></i></button>
+                <button><i class="fa fa-check" onClick="toggleComplete('${list[i].id}')" aria-hidden="true"></i></button>
+                <button><i class="fa fa-trash" onClick="deleteTask('${list[i].id}');"aria-hidden="true"></i></button>
                 </div>
             </div></div> `
         }
     }
-
-
     document.getElementById("task-board").innerHTML = resultHTML;
 }
 
 function toggleComplete(id){
-    console.log("id",id)
     for(let i=0;i<taskList.length;i++){
         if(taskList[i].id == id){
             taskList[i].isComplete = !taskList[i].isComplete;
             break;
         }
     }
-    
 }
 
 function deleteTask(id){
@@ -75,11 +84,28 @@ function deleteTask(id){
             break;
         }
     }
-    render();
-    console.log(taskList)
+    render();    
 }
 
-function tandomIDGenerate(){
+function filter(event){
+    mode = event.target.id;
+    if(mode == "all"){
+        render();
+    }else if(mode == "ongoing"){
+        for(let i=0; i<taskList.length;i++){
+            if(taskList[i].isComplete == false){
+                filterList.push(taskList[i]);
+            }
+        }
+        taskList = filterList;
+        render();
+    }
+    console.log(taskList);
+    console.log(filterList);
+
+}
+
+function randomIDGenerate(){
     return "_" + Math.random().toString(36).substr(2, 9);
 }
 
